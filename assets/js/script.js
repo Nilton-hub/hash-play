@@ -1,26 +1,26 @@
 const cells = document.querySelectorAll('.hash-container div');
-const modal = document.querySelector('dialog');
+const modalRestart = document.querySelector('dialog.play-restart');
 const restart = document.querySelector('button.restart');
 const pTurn = document.querySelector('p.turn');
+const modalUserOption = document.querySelector('dialog.user-option');
+const userOptions = modalUserOption.querySelectorAll('input[type="radio"]');
 let check;
 
-modal.querySelector('button').onclick = () => modal.close();
+modalRestart.querySelector('button').onclick = () => modalRestart.close();
+window.onload = () => {
+    modalUserOption.showModal();
+}
 
 let play1 = '';
 
-while (true) {
-    play1 = window.prompt('Você é X ou O? (S para Sair)');
-    // play1 = 'X';
-    if (play1)
-        play1 = play1.toLocaleUpperCase();
-    if (play1 === 'S') {
-        play1 = ''
-        break;
-    }
-    if (['X', 'O'].includes(play1)) {
-        break;
-    }
-}
+userOptions.forEach(option => {
+    option.addEventListener('change', () => {
+        play1 = option.value;
+        if (play1)
+            toPlay();
+        modalUserOption.close();
+    });
+});
 
 function toPlay() {
     if (!play1)
@@ -44,8 +44,8 @@ function toPlay() {
                     cells[w].classList.add('emphasis');
                 });
                 document.querySelector('section.hash-container').classList.add('game-over');
-                modal.showModal();
-                modal.querySelector('p').innerHTML = 
+                modalRestart.showModal();
+                modalRestart.querySelector('p').innerHTML = 
                     `${play === 'X' ? 'O' : 'A' } <b style="color: blue;">${play}</b> ganhou!`;
                 pTurn.textContent = '';
             } else {
@@ -54,8 +54,8 @@ function toPlay() {
                 pTurn.textContent = `Vez da jogada: ${play}`;
             }
             if (win === null && !hash.includes('')) {
-                modal.showModal();
-                modal.querySelector('p').innerHTML = 'Empate!';
+                modalRestart.showModal();
+                modalRestart.querySelector('p').innerHTML = 'Empate!';
                 pTurn.textContent = '';
             }
             cell.removeEventListener('click', check);
@@ -84,9 +84,6 @@ function verifyWin(hash, opt) {
     }
     return null;
 }
-
-if (play1)
-    toPlay();
 
 restart.onclick = () => {
     window.location.reload();
