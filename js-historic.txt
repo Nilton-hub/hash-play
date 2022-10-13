@@ -1,27 +1,26 @@
 const cells = document.querySelectorAll('.hash-container div');
-const modalRestart = document.querySelector('dialog.play-restart');
+const modal = document.querySelector('dialog');
 const restart = document.querySelector('button.restart');
 const pTurn = document.querySelector('p.turn');
-const modalUserOption = document.querySelector('dialog.user-option');
-const userOptions = modalUserOption.querySelectorAll('input[type="radio"]');
 let check;
 
-modalRestart.querySelector('button').onclick = () => modalRestart.close();
-window.onload = () => {
-    modalUserOption.showModal();
-}
+modal.querySelector('button').onclick = () => modal.close();
 
 let play1 = '';
 
-userOptions.forEach(option => {
-    option.checked = false;
-    option.addEventListener('change', () => {
-        play1 = option.value;
-        if (play1)
-            toPlay();
-        modalUserOption.close();
-    });
-});
+while (true) {
+    play1 = window.prompt('Você é X ou O? (S para Sair)');
+    // play1 = 'X';
+    if (play1)
+        play1 = play1.toLocaleUpperCase();
+    if (play1 === 'S') {
+        play1 = ''
+        break;
+    }
+    if (['X', 'O'].includes(play1)) {
+        break;
+    }
+}
 
 function toPlay() {
     if (!play1)
@@ -37,7 +36,6 @@ function toPlay() {
     let win = null;
     cells.forEach((cell, index) => {
         check = e => {
-            cell.removeEventListener('click', check);
             hash[index] = play;
             win = verifyWin(hash, play)
             if (win !== null && win.includes(index)) {
@@ -46,20 +44,21 @@ function toPlay() {
                     cells[w].classList.add('emphasis');
                 });
                 document.querySelector('section.hash-container').classList.add('game-over');
-                modalRestart.showModal();
-                modalRestart.querySelector('p').innerHTML = 
+                modal.showModal();
+                modal.querySelector('p').innerHTML = 
                     `${play === 'X' ? 'O' : 'A' } <b style="color: blue;">${play}</b> ganhou!`;
                 pTurn.textContent = '';
-            } else if (cell.textContent.length < 1) {
+            } else {
                 cell.textContent = play;
                 play = play === 'O' ? 'X' : 'O';
                 pTurn.textContent = `Vez da jogada: ${play}`;
             }
             if (win === null && !hash.includes('')) {
-                modalRestart.showModal();
-                modalRestart.querySelector('p').innerHTML = 'Empate!';
+                modal.showModal();
+                modal.querySelector('p').innerHTML = 'Empate!';
                 pTurn.textContent = '';
             }
+            cell.removeEventListener('click', check);
         };
         cell.addEventListener('click', check);
     });
@@ -85,6 +84,9 @@ function verifyWin(hash, opt) {
     }
     return null;
 }
+
+if (play1)
+    toPlay();
 
 restart.onclick = () => {
     window.location.reload();
